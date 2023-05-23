@@ -1,0 +1,3011 @@
+openapi: 3.0.1
+info:
+  title: HealthOne API Docs
+  description: HealthOne API document
+  license:
+    name: MIT Licence
+    url: https://opensource.org/licenses/MIT
+  version: Ver.1.0.0
+servers:
+  - url: https://localhost:8080
+tags:
+  - name: Auth
+    description: 인증 관련 컨트롤러
+  - name: Challenge
+    description: 챌린지 관련 컨트롤러
+  - name: Participants
+    description: 챌린지 참가 관련 컨트롤러
+  - name: Walk
+    description: 걸음 수 관련 컨트롤러
+  - name: HeartRate
+    description: 심박수 관련 컨트롤러
+  - name: Sleep
+    description: 수면 관련 컨트롤러
+  - name: HealthStat
+    description: 건강 기록 관련 컨트롤러
+  - name: HealthAdvice
+    description: 회원 조언 컨트롤러
+  - name: HealthInfo
+    description: 회원 헬스 정보 관련 컨트롤러
+  - name: Meal
+    description: 식사 관련 컨트롤러
+  - name: Food
+    description: 음식 데이터 관련 컨트롤러
+  - name: CustomFood
+    description: 사용자 음식 데이터 관련 컨트롤러
+  - name: Calorie
+    description: 칼로리 관련 컨트롤러
+  - name: SportRecord
+    description: 운동 기록 관련 컨트롤러
+  - name: Sport
+    description: 일반 운동 데이터 관련 컨트롤러
+  - name: CustomSport
+    description: 사용자 운동 데이터 관련 컨트롤러
+  - name: Activity
+    description: 활동 관련 컨트롤러
+  - name: Check-data-download
+    description: Check service 정보 다운로드 컨트롤러
+  - name: Info-data-download
+    description: Info service 정보 다운로드 컨트롤러
+  - name: Meal-data-download
+    description: Meal service 정보 다운로드 컨트롤러
+paths:
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: 로그인
+      description: 로그인 API
+      operationId: signInOrUp
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+        required: true
+      responses:
+        '200':
+          description: 로그인 성공
+          content:
+            application/json:
+              schema:
+                type: string
+  /auth/verify:
+    post:
+      tags:
+        - Auth
+      summary: 토큰 검증
+      description: 토큰 검증 API
+      operationId: verifyToken
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: true
+          schema:
+            type: string
+          example: Bearer access_token
+      responses:
+        '200':
+          description: 토큰 검증 성공
+          content:
+            application/json: {}
+      security:
+        - bearerAuth: []
+  /auth/logout:
+    post:
+      tags:
+        - Auth
+      summary: 로그아웃
+      description: 로그아웃 API
+      operationId: logout
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: true
+          schema:
+            type: string
+          example: Bearer access_token
+      responses:
+        '200':
+          description: 로그아웃 성공
+          content:
+            application/json: {}
+      security:
+        - bearerAuth: []
+  /api/participants:
+    post:
+      tags:
+        - Participants
+      summary: 챌린지 참가 등록
+      description: 챌린지 참가 등록 API
+      operationId: insert
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+      requestBody:
+        description: 챌린지 등록 객체
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParticipantsInsertDto'
+        required: true
+      responses:
+        '200':
+          description: 챌린지 참가 등록 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParticipantsInsertDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - Participants
+      summary: 챌린지 참가 취소
+      description: 챌린지 참가 취소 API
+      operationId: delete
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+        - name: 'no'
+          in: query
+          description: 참가번호
+          required: true
+          schema:
+            type: integer
+            format: int32
+          example: 1
+      responses:
+        '200':
+          description: 챌린지 참가 취소 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParticipantsInsertDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+  /api/challenge:
+    get:
+      tags:
+        - Challenge
+      summary: 챌린지 메인페이지 정보 조회
+      description: 챌린지 메인페이지 정보를 반환한다.
+      operationId: getChallengeMainPageData
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+      responses:
+        '200':
+          description: 챌린지 메인페이지 데이터 반환 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChallengeResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+  /api/challenge/detail:
+    get:
+      tags:
+        - Challenge
+      summary: 챌린지 세부 정보 조회
+      description: 챌린지 세부 정보를 반환한다.
+      operationId: getChallengeData
+      parameters:
+        - name: 'no'
+          in: query
+          description: 챌린지 식별번호
+          required: true
+          schema:
+            type: integer
+            format: int32
+          example: 1
+      responses:
+        '200':
+          description: 챌린지 세부 정보를 반환 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChallengeResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+  /api/health-stat:
+    get:
+      tags:
+        - HealthStat
+      summary: 건강 기록 조회 리스트
+      description: 회원 헬스 정보 조회 리스트 (한달) API
+      operationId: getHealthStat
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+        - name: date
+          in: query
+          description: 건강 기록 조회 날짜
+          required: true
+          schema:
+            type: string
+          example: '2023-05-03T00:00:00'
+      responses:
+        '200':
+          description: 건강 기록 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - HealthStat
+      summary: 건강 기록 등록
+      description: 건강 기록 등록 API
+      operationId: addHealthStat
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+      requestBody:
+        description: 건강기록 등록 객체
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HealthStatDto'
+        required: true
+      responses:
+        '200':
+          description: 건강 기록 등록 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - HealthStat
+      summary: 건강 기록 삭제
+      description: 건강 기록 삭제 API
+      operationId: deleteHealthStat
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+        - name: 'no'
+          in: query
+          description: 건강기록 식별번호
+          required: true
+          schema:
+            type: integer
+            format: int32
+          example: 1
+      responses:
+        '200':
+          description: 건강 기록 삭제 성공
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int32
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+    patch:
+      tags:
+        - HealthStat
+      summary: 건강 기록 수정
+      description: 건강 기록 수정 API
+      operationId: updateHealthStat
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+      requestBody:
+        description: 건강기록 수정 객체
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HealthStatDto'
+        required: true
+      responses:
+        '200':
+          description: 건강 기록 수정 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+  /api/health-info:
+    get:
+      tags:
+        - HealthInfo
+      summary: 회원 헬스 정보 조회
+      description: 회원 헬스 정보 조회 API
+      operationId: getHealthInfo
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+      responses:
+        '200':
+          description: 회원 헬스 정보 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthInfoDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+    patch:
+      tags:
+        - HealthInfo
+      summary: 회원 헬스 정보 등록, 수정
+      description: 회원 헬스 정보 등록, 수정 API (처음 요청시 DB에 값을 저장함)
+      operationId: updateHealthInfo
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+      requestBody:
+        description: 회원 헬스 데이터 등록, 수정 객체
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HealthInfoDto'
+        required: true
+      responses:
+        '200':
+          description: 회원 헬스 데이터 등록, 수정 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthInfoDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+  /info-data-download/stat:
+    get:
+      tags:
+        - Info-data-download
+      summary: 회원 건강 기록 데이터 다운
+      description: 회원 건강 기록 다운로드 한다
+      operationId: downloadHeartRateData
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+      responses:
+        '200':
+          description: HealthStat 데이터 다운로드 성공
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+  /info-data-download/healthinfo:
+    get:
+      tags:
+        - Info-data-download
+      summary: 회원 건강 데이터 다운
+      description: 회원 건강 데이터를 다운로드 한다
+      operationId: downloadWalkData
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+      responses:
+        '200':
+          description: HealthInfo 데이터 다운로드 성공
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+  /api/health-advice:
+    get:
+      tags:
+        - HealthAdvice
+      summary: 회원 건강 조언 조회
+      description: 회원 건강 조언 조회 (가장 최신) API
+      operationId: getHealthAdvice
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+      responses:
+        '200':
+          description: 회원 건강 조언 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthAdviceDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+  /api/walk:
+    get:
+      tags:
+        - Walk
+      summary: 걸음 수 리스트 조회
+      description: 걸음 수 리스트 조회 API
+      operationId: getWalkEntitiesForSevenDays
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+        - name: dateTime
+          in: query
+          description: 걸음수 리스트 조회 날짜
+          required: true
+          schema:
+            type: string
+          example: '2023-05-03'
+      responses:
+        '200':
+          description: 걸음 수 리스트 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WalkResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - Walk
+      summary: 걸음 수 등록
+      description: 걸음 수 등록 API
+      operationId: insertWalkInfo
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+      requestBody:
+        description: 걸음 수 등록 객체
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WalkReqDto'
+        required: true
+      responses:
+        '200':
+          description: 걸음 수 데이터 등록 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WalkResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - Walk
+      summary: 걸음 수 데이터 삭제
+      description: 걸음 수 데이터 삭제 API
+      operationId: deleteWalkInfo
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+        - name: 'no'
+          in: query
+          description: 걸음 수 식별번호
+          required: true
+          schema:
+            type: integer
+            format: int32
+          example: 1
+      responses:
+        '200':
+          description: 걸음 수 데이터 삭제 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WalkResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+  /api/sleep:
+    post:
+      tags:
+        - Sleep
+      summary: 수면 정보 등록
+      description: 수면 정보 등록 조회 API
+      operationId: addSleepInfo
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+      requestBody:
+        description: 수면 정보 등록 객체
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SleepInsertDto'
+        required: true
+      responses:
+        '200':
+          description: 수면 정보 등록 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SleepResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - Sleep
+      summary: 수면 정보 삭제
+      description: 수면 정보 삭제 API
+      operationId: deleteSleepInfo
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+        - name: 'no'
+          in: query
+          description: 수면 데이터 식별번호
+          required: true
+          schema:
+            type: integer
+            format: int32
+          example: 1
+      responses:
+        '200':
+          description: 수면 정보 삭제 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SleepResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+    patch:
+      tags:
+        - Sleep
+      summary: 수면 정보 수정
+      description: 수면 정보 수정 API
+      operationId: updateSleepInfo
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+      requestBody:
+        description: 수면 정보 등록 객체
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SleepUpdateDto'
+        required: true
+      responses:
+        '200':
+          description: 수면 정보 수정 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SleepResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+  /api/heart-rate:
+    get:
+      tags:
+        - HeartRate
+      summary: 심박수 리스트 조회
+      description: 회원의 심박수를 최신순으로 출력한다
+      operationId: getHeartRateInfo
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+        - name: page
+          in: query
+          description: 페이지 번호 (0..N)
+          required: false
+          example: 0
+          content:
+            '*/*':
+              schema:
+                type: Integer
+                default: '0'
+        - name: size
+          in: query
+          description: 페이지 크기
+          required: false
+          example: 7
+          content:
+            '*/*':
+              schema:
+                type: Integer
+                default: '7'
+        - name: sort
+          in: query
+          description: 'Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.'
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HeartRateResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - HeartRate
+      summary: 심박수 등록
+      description: 회원의 심박수를 등록한다
+      operationId: addHeartRateInfo
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+      requestBody:
+        description: 심박수 등록 객체
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HeartRateInsertDto'
+        required: true
+      responses:
+        '200':
+          description: 심박수 추가 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HeartRateResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - HeartRate
+      summary: 심박수 삭제
+      description: 회원의 심박수를 삭제한다
+      operationId: deleteHeartRateInfo
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+        - name: 'no'
+          in: query
+          description: 심박수 식별 번호
+          required: true
+          schema:
+            type: integer
+            format: int32
+          example: 1
+      responses:
+        '200':
+          description: 심박수 데이터 삭제 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HeartRateResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+  /check-data-download/walk:
+    get:
+      tags:
+        - Check-data-download
+      summary: 걸음 수 데이터 다운
+      description: 걸음 수 데이터를 다운로드 한다
+      operationId: downloadWalkData
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+      responses:
+        '200':
+          description: Walk 데이터 다운로드 성공
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+  /check-data-download/sleep:
+    get:
+      tags:
+        - Check-data-download
+      summary: 수면 데이터 다운
+      description: 수면 데이터를 다운로드 한다
+      operationId: downloadHeartRateData
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+      responses:
+        '200':
+          description: Sleep 데이터 다운로드 성공
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+  /check-data-download/heart-rate:
+    get:
+      tags:
+        - Check-data-download
+      summary: 심박수 데이터 다운
+      description: 심박수 데이터를 다운로드 한다
+      operationId: downloadSleepData
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+      responses:
+        '200':
+          description: HeartRate 데이터 다운로드 성공
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+  /api/walk/detail:
+    get:
+      tags:
+        - Walk
+      summary: 걸음 수 세부 정보 조회
+      description: 걸음 수 세부 정보 조회 API
+      operationId: getDetailedWalkInfo
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+        - name: date
+          in: query
+          description: 걸음수 날짜
+          required: true
+          schema:
+            type: string
+          example: '2023-05-03'
+      responses:
+        '200':
+          description: 걸음 수 세부 정보 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalkResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+        DB_100:
+          description: DB에 해당 데이터를 찾을 수 없음
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+  /api/walk/avgdata:
+    get:
+      tags:
+        - Walk
+      summary: 걸음 수 비교 데이터 조회
+      description: 걸음 수 비교 데이터 조회 API
+      operationId: getWalkPeopleData
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+      responses:
+        '200':
+          description: 걸음 수 비교 데이터 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WalkResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+  /api/sleep/list:
+    get:
+      tags:
+        - Sleep
+      summary: 수면정보 리스트 조회
+      description: 회원의 수면정보를 최신순 조회 API (이날로부터 일주일 데이터 반환)
+      operationId: getSleepDataList
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+        - name: date
+          in: query
+          description: 수면 리스트 정보 날짜 조회(이날로부터 일주일 데이터 반환)
+          required: true
+          schema:
+            type: string
+          example: '2023-05-10T00:00:00'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HeartRateResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+  /api/sleep/detail:
+    get:
+      tags:
+        - Sleep
+      summary: 수면 세부 정보 조회
+      description: 수면 세부 정보 조회 조회 API (당일)
+      operationId: getSleepData
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+        - name: date
+          in: query
+          description: 수면 세부 정보 조회 날짜
+          required: true
+          schema:
+            type: string
+          example: '2023-05-03T00:00:00'
+      responses:
+        '200':
+          description: 수면 세부 정보 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SleepResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+        DB_100:
+          description: DB에 해당 데이터를 찾을 수 없음
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+  /api/sportrecord:
+    get:
+      tags:
+        - SportRecord
+      summary: 날짜 운동 기록 정보 리스트 조회
+      description: 날짜 운동 기록 정보 리스트 조회 API
+      operationId: getSportRecordList
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+        - name: date
+          in: query
+          description: 운동 날짜
+          required: true
+          schema:
+            type: string
+          example: '2023-05-03T00:00:00'
+      responses:
+        '200':
+          description: (날짜)날짜 운동 기록 정보 리스트 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SportRecordResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+        DB_100:
+          description: DB에 해당 데이터를 찾을 수 없음
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - SportRecord
+      summary: 운동 기록 등록
+      description: 운동 기록 등록 API
+      operationId: insertSportRecord
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+      requestBody:
+        description: 운동 기록 등록 객체
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SportRecordReqDto'
+        required: true
+      responses:
+        '200':
+          description: 운동 기록 등록 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SportRecordResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - SportRecord
+      summary: 운동 기록 삭제
+      description: 운동 기록 삭제 API
+      operationId: deleteSportRecord
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+        - name: 'no'
+          in: query
+          description: 운동 기록 식별번호
+          required: true
+          schema:
+            type: integer
+            format: int32
+          example: 1
+      responses:
+        '200':
+          description: 운동 기록 삭제 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SportRecordResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+    patch:
+      tags:
+        - SportRecord
+      summary: 운동 기록 수정
+      description: 운동 기록 수정 API
+      operationId: updateSportRecord
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+      requestBody:
+        description: 운동 기록 수정 객체
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SportRecordReqDto'
+        required: true
+      responses:
+        '200':
+          description: 운동 기록 수정 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SportRecordResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+  /api/meal-record:
+    get:
+      tags:
+        - Meal
+      summary: 식사 정보 단일 조회
+      description: 식사 정보 단일 조회 API
+      operationId: getMeal
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+        - name: 'no'
+          in: query
+          description: 식사 정보 식별번호
+          required: true
+          schema:
+            type: integer
+            format: int32
+          example: 1
+      responses:
+        '200':
+          description: 식사 정보 단일 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MealResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+        DB_100:
+          description: DB에 해당 데이터를 찾을 수 없음
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - Meal
+      summary: 식사 등록
+      description: 식사 등록 API
+      operationId: insertMeal
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+      requestBody:
+        description: 식사 등록 객체
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MealReqDto'
+        required: true
+      responses:
+        '200':
+          description: 식사 등록 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MealResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - Meal
+      summary: 식사 삭제
+      description: 식사 삭제 API
+      operationId: updateMeal_1
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+        - name: 'no'
+          in: query
+          description: 식사 식별번호
+          required: true
+          schema:
+            type: integer
+            format: int32
+          example: 1
+      responses:
+        '200':
+          description: 식사 삭제 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MealResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+    patch:
+      tags:
+        - Meal
+      summary: 식사 수정
+      description: 식사 수정 API
+      operationId: updateMeal
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+      requestBody:
+        description: 식사 수정 객체
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MealReqDto'
+        required: true
+      responses:
+        '200':
+          description: 식사 수정 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MealResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+  /api/customsport:
+    get:
+      tags:
+        - CustomSport
+      summary: 사용자 운동 데이터 조회 반환
+      description: 사용자 운동 데이터 조회 API
+      operationId: getCustomSportData
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+        - name: 'no'
+          in: query
+          description: 사용자 운동 식별번호
+          required: true
+          schema:
+            type: integer
+            format: int32
+          example: 1
+      responses:
+        '200':
+          description: 운동 데이터 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomSportResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - CustomSport
+      summary: 사용자 운동 데이터 등록
+      description: 사용자 운동 데이터 등록 API
+      operationId: insertCustomSportData
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+      requestBody:
+        description: 사용자 운등 등록 객체
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomSportReqDto'
+        required: true
+      responses:
+        '200':
+          description: 사용자 운동 데이터 등록 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomSportResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - CustomSport
+      summary: 사용자 운동 데이터 삭제
+      description: 사용자 운동 데이터 삭제 API
+      operationId: deleteCustomSportData
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+        - name: 'no'
+          in: query
+          description: 사용자 운동 식별번호
+          required: true
+          schema:
+            type: integer
+            format: int32
+          example: 1
+      responses:
+        '200':
+          description: 사용자 운동 데이터 삭제 성공
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int32
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+    patch:
+      tags:
+        - CustomSport
+      summary: 사용자 운동 데이터 수정
+      description: 사용자 운동 데이터 수정 API
+      operationId: updateCustomSportData
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+      requestBody:
+        description: 사용자 운동 수정 객체
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomSportReqDto'
+        required: true
+      responses:
+        '200':
+          description: 사용자 운동 데이터 수정 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomSportResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+  /api/customfood:
+    get:
+      tags:
+        - CustomFood
+      summary: 사용자 음식 단일 정보 반환
+      description: 사용자 음식 데이터 단건 조회 API
+      operationId: getCustomFood_1
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+        - name: 'no'
+          in: query
+          description: 사용자 음식 식별번호
+          required: true
+          schema:
+            type: integer
+            format: int32
+          example: 1
+      responses:
+        '200':
+          description: 사용자 음식 데이터 단건 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomFoodResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+        DB_100:
+          description: DB에 해당 데이터를 찾을 수 없음
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - CustomFood
+      summary: 사용자 음식 데이터 등록
+      description: 사용자 음식 데이터 등록 API
+      operationId: getCustomFood
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+      requestBody:
+        description: 사용자 음식 등록 객체
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomFoodReqDto'
+        required: true
+      responses:
+        '200':
+          description: 사용자 음식 데이터 등록 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CustomFoodResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - CustomFood
+      summary: 사용자 음식 데이터 삭제
+      description: 사용자 음식 데이터 삭제 API
+      operationId: deleteCustomFood
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+        - name: 'no'
+          in: query
+          description: 사용자 음식 데이터 식별번호
+          required: true
+          schema:
+            type: integer
+            format: int32
+          example: 1
+      responses:
+        '200':
+          description: 사용자 음식 데이터 삭제 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CustomFoodResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+    patch:
+      tags:
+        - CustomFood
+      summary: 사용자 음식 데이터 수정
+      description: 사용자 음식 데이터 수정 API
+      operationId: modifyCustomFood
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+      requestBody:
+        description: 식사 수정 객체
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomFoodReqDto'
+        required: true
+      responses:
+        '200':
+          description: 사용자 음식 데이터 수정 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CustomFoodResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+  /meal-data-download/sportrecord:
+    get:
+      tags:
+        - Meal-data-download
+      summary: 운동기록 데이터 다운
+      description: 운동기록 데이터를 다운로드 한다
+      operationId: downloadHeartRateData
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+      responses:
+        '200':
+          description: SportRecord 데이터 다운로드 성공
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+  /meal-data-download/meal:
+    get:
+      tags:
+        - Meal-data-download
+      summary: ' 식단 데이터 다운'
+      description: 식단 데이터를 다운로드 한다
+      operationId: downloadWalkData
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+      responses:
+        '200':
+          description: Meal 데이터 다운로드 성공
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+  /api/sport:
+    get:
+      tags:
+        - Sport
+      summary: 운동 데이터 조회 반환
+      description: 일반 운동 데이터 조회 API
+      operationId: getSportData
+      parameters:
+        - name: 'no'
+          in: query
+          description: 운동 식별번호
+          required: true
+          schema:
+            type: integer
+            format: int32
+          example: 1
+      responses:
+        '200':
+          description: 운동 데이터 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SportResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+  /api/sport/search:
+    get:
+      tags:
+        - Sport
+      summary: 일반 운동 데이터 검색 정보 반환
+      description: 일반 운동 데이터 검색 정보 반환 API
+      operationId: searchSport
+      parameters:
+        - name: name
+          in: query
+          description: 운동 검색
+          required: true
+          schema:
+            type: string
+          example: 걷기
+      responses:
+        '200':
+          description: 운동 데이터 검색 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SportResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+  /api/meal-record/list:
+    get:
+      tags:
+        - Meal
+      summary: 식사 정보 리스트 조회
+      description: 식사 정보 리스트 조회 (날짜기반) API
+      operationId: getMealList
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+        - name: date
+          in: query
+          description: 조회 날짜
+          required: true
+          schema:
+            type: string
+          example: '2023-05-03T00:00:00'
+      responses:
+        '200':
+          description: 식사 리스트 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MealResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+  /api/food:
+    get:
+      tags:
+        - Food
+      summary: 일반 음식 단일 정보 반환
+      description: 일반 음식 단일 정보 반환 API
+      operationId: getFood
+      parameters:
+        - name: 'no'
+          in: query
+          description: 음식 단일 데이터 식별번호
+          required: true
+          schema:
+            type: integer
+            format: int32
+          example: 1
+      responses:
+        '200':
+          description: 음식 데이터 단일 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FoodResponseDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+        DB_100:
+          description: DB에 해당 데이터를 찾을 수 없음
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/food/search:
+    get:
+      tags:
+        - Food
+      summary: 일반 음식 검색 정보 반환
+      description: 일반 음식 검색 정보 반환 API
+      operationId: searchFood
+      parameters:
+        - name: name
+          in: query
+          description: 음식 이름
+          required: true
+          schema:
+            type: string
+          example: 김밥
+        - name: page
+          in: query
+          description: 페이지 번호 (0~N)
+          required: false
+          content:
+            '*/*':
+              schema:
+                type: Integer
+                default: '0'
+        - name: size
+          in: query
+          description: '페이지 크기 (기본: 20)'
+          required: false
+          content:
+            '*/*':
+              schema:
+                type: Integer
+                default: '20'
+        - name: sort
+          in: query
+          description: 'Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.'
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: 음식 검색 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FoodResponseDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+  /api/customsport/search:
+    get:
+      tags:
+        - CustomSport
+      summary: 사용자 운동 데이터 검색 정보 반환
+      description: 사용자 운동 데이터 검색 반환 API
+      operationId: searchCustomSport
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+        - name: name
+          in: query
+          description: 사용자 운동 이름
+          required: true
+          schema:
+            type: string
+          example: 걷기
+      responses:
+        '200':
+          description: 사용자 운동 데이터 검색 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CustomSportResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+  /api/customfood/serarch:
+    get:
+      tags:
+        - CustomFood
+      summary: 사용자 음식 데이터 검색
+      description: 사용자 음식 데이터 검색 API
+      operationId: getCustomFood_2
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+        - name: name
+          in: query
+          description: 사용자 음식 이름
+          required: true
+          schema:
+            type: string
+          example: 김밥
+      responses:
+        '200':
+          description: 사용자 음식 데이터 검색 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CustomFoodResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+  /api/calorie:
+    get:
+      tags:
+        - Calorie
+      summary: 해당 날짜 섭취, 소비 칼로리 조회
+      description: 해당 날짜 섭취, 소비 칼로리 조회 API
+      operationId: getMeal_1
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+        - name: date
+          in: query
+          description: 조회 날짜
+          required: true
+          schema:
+            type: string
+          example: '2023-05-03T00:00:00'
+      responses:
+        '200':
+          description: date날짜 섭취, 소모 칼로리 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalorieResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+        DB_100:
+          description: DB에 해당 데이터를 찾을 수 없음
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+  /api/calorie/week:
+    get:
+      tags:
+        - Calorie
+      summary: 해당 날짜로부터 일주일간 섭취, 소비 칼로리 조회
+      description: 해당 날짜로부터 일주일간 섭취, 소비 칼로리 조회 API
+      operationId: getMealWeekData
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+        - name: date
+          in: query
+          description: 조회 날짜
+          required: true
+          schema:
+            type: string
+          example: '2023-05-03T00:00:00'
+      responses:
+        '200':
+          description: date날짜로부터 일주일 섭취, 소모 칼로리 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalorieResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+        DB_100:
+          description: DB에 해당 데이터를 찾을 수 없음
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+  /api/activity:
+    get:
+      tags:
+        - Activity
+      summary: 회원 활동시간(최고, 총), 소비 칼로리(최고, 총) 반환 조회
+      description: 회원 활동시간, 칼로리 반환 API
+      operationId: getActivityData
+      parameters:
+        - name: Authorization
+          in: header
+          description: 회원 Access Token
+          required: false
+          schema:
+            type: string
+          example: Bearer access_token
+      responses:
+        '200':
+          description: 회원 활동량(총, 최고), 소비칼로리(총, 최고) 반환 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalorieResDto'
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RestApiResponse'
+      security:
+        - bearerAuth: []
+components:
+  schemas:
+    RestApiResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: 응답 시간
+          format: date-time
+        message:
+          type: string
+          description: 상태 메세지
+          example: 상태메세지
+        data:
+          type: object
+          description: 응답 데이터
+        success:
+          type: boolean
+      description: 전역 응답 반환 DTO
+    RestApiException:
+      type: object
+      properties:
+        cause:
+          type: object
+          properties:
+            stackTrace:
+              type: array
+              items:
+                type: object
+                properties:
+                  classLoaderName:
+                    type: string
+                  moduleName:
+                    type: string
+                  moduleVersion:
+                    type: string
+                  methodName:
+                    type: string
+                  fileName:
+                    type: string
+                  lineNumber:
+                    type: integer
+                    format: int32
+                  className:
+                    type: string
+                  nativeMethod:
+                    type: boolean
+            message:
+              type: string
+            suppressed:
+              type: array
+              items:
+                type: object
+                properties:
+                  stackTrace:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        classLoaderName:
+                          type: string
+                        moduleName:
+                          type: string
+                        moduleVersion:
+                          type: string
+                        methodName:
+                          type: string
+                        fileName:
+                          type: string
+                        lineNumber:
+                          type: integer
+                          format: int32
+                        className:
+                          type: string
+                        nativeMethod:
+                          type: boolean
+                  message:
+                    type: string
+                  localizedMessage:
+                    type: string
+            localizedMessage:
+              type: string
+        stackTrace:
+          type: array
+          items:
+            type: object
+            properties:
+              classLoaderName:
+                type: string
+              moduleName:
+                type: string
+              moduleVersion:
+                type: string
+              methodName:
+                type: string
+              fileName:
+                type: string
+              lineNumber:
+                type: integer
+                format: int32
+              className:
+                type: string
+              nativeMethod:
+                type: boolean
+        errorCode:
+          $ref: '#/components/schemas/ErrorCode'
+        message:
+          type: string
+        suppressed:
+          type: array
+          items:
+            type: object
+            properties:
+              stackTrace:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    classLoaderName:
+                      type: string
+                    moduleName:
+                      type: string
+                    moduleVersion:
+                      type: string
+                    methodName:
+                      type: string
+                    fileName:
+                      type: string
+                    lineNumber:
+                      type: integer
+                      format: int32
+                    className:
+                      type: string
+                    nativeMethod:
+                      type: boolean
+              message:
+                type: string
+              localizedMessage:
+                type: string
+        localizedMessage:
+          type: string
+    ErrorCode:
+      type: object
+      properties:
+        message:
+          type: string
+        httpStatus:
+          type: string
+          enum:
+            - 100 CONTINUE
+            - 101 SWITCHING_PROTOCOLS
+            - 102 PROCESSING
+            - 103 CHECKPOINT
+            - 200 OK
+            - 201 CREATED
+            - 202 ACCEPTED
+            - 203 NON_AUTHORITATIVE_INFORMATION
+            - 204 NO_CONTENT
+            - 205 RESET_CONTENT
+            - 206 PARTIAL_CONTENT
+            - 207 MULTI_STATUS
+            - 208 ALREADY_REPORTED
+            - 226 IM_USED
+            - 300 MULTIPLE_CHOICES
+            - 301 MOVED_PERMANENTLY
+            - 302 FOUND
+            - 302 MOVED_TEMPORARILY
+            - 303 SEE_OTHER
+            - 304 NOT_MODIFIED
+            - 305 USE_PROXY
+            - 307 TEMPORARY_REDIRECT
+            - 308 PERMANENT_REDIRECT
+            - 400 BAD_REQUEST
+            - 401 UNAUTHORIZED
+            - 402 PAYMENT_REQUIRED
+            - 403 FORBIDDEN
+            - 404 NOT_FOUND
+            - 405 METHOD_NOT_ALLOWED
+            - 406 NOT_ACCEPTABLE
+            - 407 PROXY_AUTHENTICATION_REQUIRED
+            - 408 REQUEST_TIMEOUT
+            - 409 CONFLICT
+            - 410 GONE
+            - 411 LENGTH_REQUIRED
+            - 412 PRECONDITION_FAILED
+            - 413 PAYLOAD_TOO_LARGE
+            - 413 REQUEST_ENTITY_TOO_LARGE
+            - 414 URI_TOO_LONG
+            - 414 REQUEST_URI_TOO_LONG
+            - 415 UNSUPPORTED_MEDIA_TYPE
+            - 416 REQUESTED_RANGE_NOT_SATISFIABLE
+            - 417 EXPECTATION_FAILED
+            - 418 I_AM_A_TEAPOT
+            - 419 INSUFFICIENT_SPACE_ON_RESOURCE
+            - 420 METHOD_FAILURE
+            - 421 DESTINATION_LOCKED
+            - 422 UNPROCESSABLE_ENTITY
+            - 423 LOCKED
+            - 424 FAILED_DEPENDENCY
+            - 425 TOO_EARLY
+            - 426 UPGRADE_REQUIRED
+            - 428 PRECONDITION_REQUIRED
+            - 429 TOO_MANY_REQUESTS
+            - 431 REQUEST_HEADER_FIELDS_TOO_LARGE
+            - 451 UNAVAILABLE_FOR_LEGAL_REASONS
+            - 500 INTERNAL_SERVER_ERROR
+            - 501 NOT_IMPLEMENTED
+            - 502 BAD_GATEWAY
+            - 503 SERVICE_UNAVAILABLE
+            - 504 GATEWAY_TIMEOUT
+            - 505 HTTP_VERSION_NOT_SUPPORTED
+            - 506 VARIANT_ALSO_NEGOTIATES
+            - 507 INSUFFICIENT_STORAGE
+            - 508 LOOP_DETECTED
+            - 509 BANDWIDTH_LIMIT_EXCEEDED
+            - 510 NOT_EXTENDED
+            - 511 NETWORK_AUTHENTICATION_REQUIRED
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: 응답시간
+          format: date-time
+        message:
+          type: string
+          description: 상태메세지
+        error:
+          type: string
+          description: 에러코드
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationError'
+        success:
+          type: boolean
+      description: 전역 에러 반환 DTO
+    ValidationError:
+      type: object
+      properties:
+        field:
+          type: string
+        message:
+          type: string
+    ChallengeResDto:
+      type: object
+      properties:
+        'no':
+          type: integer
+          description: 챌린지 식별번호
+          format: int32
+        name:
+          type: string
+          description: 챌린지 이름
+        introduce:
+          type: string
+          description: 챌린지 소개
+        totalWorkCount:
+          type: string
+          description: 총 운동횟수
+        totalPeriod:
+          type: string
+          description: 총 기간(주)
+        level:
+          type: string
+          description: 챌린지 난이도
+          enum:
+            - LOW
+            - NORMAL
+            - HIGH
+        avgWorkTime:
+          type: integer
+          description: 평균 운동시간(분)
+          format: int32
+        sportEquipmentCheck:
+          type: boolean
+          description: 필요 운동기구 여부
+        equipment:
+          type: string
+          description: 운동 기구 정보
+        programType:
+          type: string
+          description: 프로그램 유형
+        recommendWeek:
+          type: string
+          description: 주간 추천 운동 요일
+        youtubeLink:
+          type: string
+          description: 유튜브 운동 영상 링크
+        thumbnailLink:
+          type: string
+          description: 썸네일 링크
+        participants:
+          type: integer
+          description: 챌린지 참여자수
+          format: int32
+        hits:
+          type: integer
+          description: 챌린지 조회수
+          format: int32
+        participantsCheck:
+          type: boolean
+          description: 회원 챌린지 참가 여부
+      description: 챌린지 응답 DTO
+    ParticipantsInsertDto:
+      type: object
+      properties:
+        userNo:
+          type: integer
+          format: int32
+        challengeNo:
+          type: integer
+          format: int32
+      description: 챌린지 참가 DTO
+    WalkReqDto:
+      required:
+        - distance
+        - stepCount
+      type: object
+      properties:
+        userNo:
+          type: integer
+          description: 회원 식별 번호
+          format: int32
+        stepCount:
+          type: integer
+          description: 걸음 수
+          format: int32
+        distance:
+          type: number
+          description: 이동 거리
+          format: float
+      description: Walk 요청(등록, 수정) DTO
+    WalkResDto:
+      type: object
+      properties:
+        'no':
+          type: integer
+          description: Walk 식별번호
+          format: int32
+        userNo:
+          type: integer
+          description: 회원 식별 번호
+          format: int32
+        createtime:
+          type: string
+          description: 기록한 시간
+          format: date-time
+        stepCount:
+          type: integer
+          description: 걸음 수
+          format: int32
+        distance:
+          type: number
+          description: 이동 거리
+          format: float
+      description: Walk 응답 DTO
+    HeartRateInsertDto:
+      required:
+        - count
+        - createTime
+      type: object
+      properties:
+        userNo:
+          type: integer
+          description: 유저 식별 번호
+          format: int32
+        createTime:
+          type: string
+          description: 심박수 등록 시간
+          format: date-time
+        count:
+          type: integer
+          description: 심박수 카운트
+          format: int32
+      description: 심박수 등록 DTO
+    HeartRateResDto:
+      type: object
+      properties:
+        'no':
+          type: integer
+          description: 심박수 식별번호
+          format: int32
+        userNo:
+          type: integer
+          description: 회원 식별 번호
+          format: int32
+        createTime:
+          type: string
+          description: 기록한 시간
+          format: date-time
+        count:
+          type: integer
+          description: 심박수
+          format: int32
+      description: 심박수 응답 DTO
+    SleepInsertDto:
+      type: object
+      properties:
+        userNo:
+          type: integer
+          description: 회원 식별 번호
+          format: int32
+        createTime:
+          type: string
+          description: 수면 날짜
+          format: date-time
+        startSleepTime:
+          type: string
+          description: 수면 시작 시간
+          format: date-time
+        endSleepTime:
+          type: string
+          description: 수면 기상 시간
+          format: date-time
+      description: 수면 등록 DTO
+    SleepResDto:
+      type: object
+      properties:
+        'no':
+          type: integer
+          description: 수면 데이터 식별 번호
+          format: int32
+        userNo:
+          type: integer
+          description: 회원 식별 번호
+          format: int32
+        createTime:
+          type: string
+          description: 수면 날짜
+          format: date-time
+        startSleepTime:
+          type: string
+          description: 수면 시작 시간
+          format: date-time
+        endSleepTime:
+          type: string
+          description: 수면 기상 시간
+          format: date-time
+      description: 수면 정보 반환 DTO
+    SleepUpdateDto:
+      type: object
+      properties:
+        'no':
+          type: string
+          description: 수면 데이터 식별 번호
+        userNo:
+          type: integer
+          description: 회원 식별 번호
+          format: int32
+        createTime:
+          type: string
+          description: 수면 데이터 식별 번호
+          format: date-time
+        startSleepTime:
+          type: string
+          description: 수면 시작 시간
+          format: date-time
+        endSleepTime:
+          type: string
+          description: 수면 기상 시간
+          format: date-time
+      description: 수면 정보 수정 요청 DTO
+    HealthStatDto:
+      required:
+        - bmi
+        - bodyFatPercentage
+        - createTime
+        - fbg
+        - hdlCholesterol
+        - height
+        - highBloodPressure
+        - lowBloodPressure
+        - skeletalMuscleMass
+        - tg
+        - waistMeasurement
+        - weight
+      type: object
+      properties:
+        'no':
+          type: integer
+          description: 건강 기록 식별번호
+          format: int32
+        userNo:
+          type: integer
+          description: 유저 식별번호
+          format: int32
+        createTime:
+          type: string
+          description: 건강 기록 날짜
+          format: date-time
+        height:
+          type: number
+          description: '건강기록 : 키'
+          format: float
+        weight:
+          type: number
+          description: '건강기록 : 몸무게'
+          format: float
+        bmi:
+          type: number
+          description: '건강 기록 : BMI'
+          format: float
+        bodyFatPercentage:
+          type: number
+          description: '건강 기록 : 체지방률'
+          format: float
+        skeletalMuscleMass:
+          type: number
+          description: '건강 기록 : 골격근량'
+          format: float
+        waistMeasurement:
+          type: number
+          description: '건강 기록 : 허리둘레'
+          format: float
+        lowBloodPressure:
+          type: number
+          description: '건강 기록 : 최저 혈압'
+          format: float
+        highBloodPressure:
+          type: number
+          description: '건강 기록 : 최고 혈압'
+          format: float
+        fbg:
+          type: number
+          description: '건강 기록 : 공복혈당'
+          format: float
+        hdlCholesterol:
+          type: number
+          description: '건강 기록 : HDL콜레스테롤'
+          format: float
+        tg:
+          type: number
+          description: '건강 기록 : 중성지방'
+          format: float
+      description: 건강 기록 DTO
+    HealthAdviceDto:
+      type: object
+      properties:
+        userNo:
+          type: integer
+          description: 건강 조언 유저 식별번호
+          format: int32
+        createtime:
+          type: string
+          description: 기록한 시간
+          format: date-time
+        weight:
+          type: string
+          description: 체중 조언
+        bmi:
+          type: string
+          description: BMI 조언
+          enum:
+            - 정상
+            - 주의
+            - 위험
+        fatPercentage:
+          type: string
+          description: 체지방률 조언
+          enum:
+            - 정상
+            - 주의
+            - 위험
+        waistMeasurement:
+          type: string
+          description: 허리둘레 조언
+          enum:
+            - 정상
+            - 주의
+            - 위험
+        fbg:
+          type: string
+          description: 공복혈당 조언
+          enum:
+            - 정상
+            - 주의
+            - 위험
+        skeletalMuscleMass:
+          type: string
+          description: 골격근량 조언
+          enum:
+            - 정상
+            - 주의
+            - 위험
+        bloodPressure:
+          type: string
+          description: 혈압 조언
+          enum:
+            - 정상
+            - 주의
+            - 위험
+        hdlCholesterol:
+          type: string
+          description: 콜레스테롤 조언
+          enum:
+            - 정상
+            - 주의
+            - 위험
+        tg:
+          type: string
+          description: 중성지방 조언
+          enum:
+            - 정상
+            - 주의
+            - 위험
+      description: 건강 조언 DTO
+    HealthInfoDto:
+      required:
+        - birthdate
+        - gender
+        - height
+        - nickname
+        - sleepTime
+        - stepGoal
+        - wakeUpTime
+        - weight
+        - workRate
+      type: object
+      properties:
+        'no':
+          type: integer
+          description: 회원 헬스 정보 식별번호
+          format: int32
+        userNo:
+          type: integer
+          description: 회원 식별번호
+          format: int32
+        nickname:
+          type: string
+          description: 회원 닉네임
+        createTime:
+          type: string
+          description: 회원 가입일시
+          format: date-time
+        gender:
+          type: boolean
+          description: 성별
+        birthdate:
+          type: string
+          description: 생년월일
+          format: date
+        height:
+          type: integer
+          description: 키
+          format: int32
+        weight:
+          type: integer
+          description: 몸무게
+          format: int32
+        workRate:
+          type: string
+          description: 활동량
+        stepGoal:
+          type: integer
+          description: 목표 걸음 수
+          format: int32
+        sleepTime:
+          $ref: '#/components/schemas/LocalTime'
+        wakeUpTime:
+          $ref: '#/components/schemas/LocalTime'
+      description: 회원 헬스정보 DTO
+    LocalTime:
+      type: object
+      properties:
+        hour:
+          type: integer
+          format: int32
+        minute:
+          type: integer
+          format: int32
+        second:
+          type: integer
+          format: int32
+        nano:
+          type: integer
+          format: int32
+      description: 목표 기상 시간
+    MealReqDto:
+      required:
+        - createTime
+        - gram
+        - kcal
+        - mealType
+        - name
+      type: object
+      properties:
+        'no':
+          type: integer
+          description: 식사 식별번호
+          format: int32
+        userNo:
+          type: integer
+          description: 회원 식별번호
+          format: int32
+        name:
+          type: string
+          description: 음식 이름
+        createTime:
+          type: string
+          description: 식사 기록 시간
+          format: date-time
+        mealType:
+          type: string
+          description: 식사 타입 (BREAKFAST, LUNCH, DINNER, SNACK)
+          enum:
+            - BREAKFAST
+            - LUNCH
+            - DINNER
+            - SNACK
+        gram:
+          type: number
+          description: 섭취한 그램 수
+          format: float
+        kcal:
+          type: integer
+          description: 섭취한 칼로리 수
+          format: int32
+      description: 식사 등록, 수정 요청 DTO
+    MealResDto:
+      type: object
+      properties:
+        'no':
+          type: integer
+          description: 식사 식별번호
+          format: int32
+        userNo:
+          type: integer
+          description: 회원 식별번호
+          format: int32
+        name:
+          type: string
+          description: 음식 이름
+        createTime:
+          type: string
+          description: 식사 기록 시간
+          format: date-time
+        mealType:
+          type: string
+          description: 식사 타입 (BREAKFAST, LUNCH, DINNER, SNACK)
+          enum:
+            - BREAKFAST
+            - LUNCH
+            - DINNER
+            - SNACK
+        gram:
+          type: number
+          description: 섭취한 그램 수
+          format: float
+        kcal:
+          type: integer
+          description: 섭취한 칼로리 수
+          format: int32
+      description: 식사 응답 요청 DTO
+    CustomFoodReqDto:
+      required:
+        - gram
+        - kcal
+        - name
+      type: object
+      properties:
+        'no':
+          type: integer
+          description: 사용자 음식 식별번호
+          format: int32
+        userNo:
+          type: integer
+          description: 회원 식별번호
+          format: int32
+        name:
+          type: string
+          description: 사용자 음식 이름
+        kcal:
+          type: integer
+          description: 사용자 음식 1인분당 칼로리
+          format: int32
+        gram:
+          type: number
+          description: 사용자 음식 1인분당 그램 수
+          format: float
+      description: 사용자 음식 등록, 수정 요청 DTO
+    CustomFoodResDto:
+      required:
+        - gram
+        - kcal
+        - name
+      type: object
+      properties:
+        'no':
+          type: integer
+          description: 사용자 음식 식별번호
+          format: int32
+        userNo:
+          type: integer
+          description: 회원 식별번호
+          format: int32
+        name:
+          type: string
+          description: 사용자 음식 이름
+        kcal:
+          type: integer
+          description: 사용자 음식 1인분당 칼로리
+          format: int32
+        gram:
+          type: number
+          description: 사용자 음식 1인분당 그램 수
+          format: float
+      description: 사용자 음식 응답 DTO
+    FoodResponseDto:
+      type: object
+      properties:
+        'no':
+          type: integer
+          description: 음식 식별번호
+          format: int32
+        name:
+          type: string
+          description: 음식 이름
+        kcal:
+          type: integer
+          description: 음식 1인분당 칼로리
+          format: int32
+        gram:
+          type: number
+          description: 음식 1인분당 그램 수
+          format: float
+      description: 일반 음식 응답 DTO
+    CalorieResDto:
+      type: object
+      properties:
+        userNo:
+          type: integer
+          description: 회원 식별 번호
+          format: int32
+        createTime:
+          type: string
+          description: 칼로리 데이터 날짜
+          format: date-time
+        sumKcalConsume:
+          type: integer
+          description: 해당 날짜 총 소비 칼로리
+          format: int32
+        sumKcalEaten:
+          type: integer
+          description: 해당 날짜 총 섭취 칼로리
+          format: int32
+      description: 칼로리 응답 DTO
+    SportRecordReqDto:
+      required:
+        - bloodPressure
+        - consumeCalorie
+        - createTime
+        - heartRate
+        - name
+        - workTime
+      type: object
+      properties:
+        'no':
+          type: integer
+          description: 운동 기록 식별번호
+          format: int32
+        userNo:
+          type: integer
+          description: 유저 식별 번호
+          format: int32
+        name:
+          type: string
+          description: 운둥 이름
+        createTime:
+          type: string
+          description: 운둥 기록 시간(날짜)
+          format: date-time
+        workTime:
+          type: number
+          description: 운동 시간
+          format: float
+        consumeCalorie:
+          type: integer
+          description: 소모된 칼로리 양
+          format: int32
+        heartRate:
+          type: integer
+          description: 평균 심박수
+          format: int32
+        bloodPressure:
+          type: integer
+          description: 평균 혈압
+          format: int32
+      description: 운동 기록 요청(등록, 수정) DTO
+    SportRecordResDto:
+      type: object
+      properties:
+        'no':
+          type: integer
+          description: 운동 기록 식별번호
+          format: int32
+        userNo:
+          type: integer
+          description: 유저 식별 번호
+          format: int32
+        name:
+          type: string
+          description: 운둥 이름
+        createTime:
+          type: string
+          description: 운둥 기록 시간(날짜)
+          format: date-time
+        workTime:
+          type: integer
+          description: 운동 시간
+          format: int32
+        consumeCalorie:
+          type: integer
+          description: 소모된 칼로리 양
+          format: int32
+        heartRate:
+          type: integer
+          description: 평균 심박수
+          format: int32
+        bloodPressure:
+          type: integer
+          description: 평균 혈압
+          format: int32
+      description: 운동 기록 응답 DTO
+    SportResDto:
+      type: object
+      properties:
+        'no':
+          type: integer
+          description: 일반 운동 데이터 식별번호
+          format: int32
+        name:
+          type: string
+          description: 일반 운동 이름
+        consumeKcal:
+          type: integer
+          description: 일반 운동 시간당 소비 칼로리
+          format: int32
+      description: 일반 운동 데이터 응답 DTO
+    CustomSportReqDto:
+      required:
+        - consumeKcal
+        - name
+      type: object
+      properties:
+        'no':
+          type: integer
+          description: 사용자 운동 데이터 식별번호
+          format: int32
+        userNo:
+          type: integer
+          description: 회원식별번호
+          format: int32
+        name:
+          type: string
+          description: 사용자 운동 이름
+        consumeKcal:
+          type: integer
+          description: 사용자 운동 시간당 소비 칼로리
+          format: int32
+      description: 사용자 운동 데이터 요청(등록, 수정) DTO
+    CustomSportResDto:
+      required:
+        - consumeKcal
+        - name
+        - 'no'
+        - userNo
+      type: object
+      properties:
+        'no':
+          type: integer
+          description: 사용자 운동 데이터 식별번호
+          format: int32
+        userNo:
+          type: integer
+          description: 회원식별번호
+          format: int32
+        name:
+          type: string
+          description: 사용자 운동 이름
+        consumeKcal:
+          type: integer
+          description: 사용자 운동 시간당 소비 칼로리
+          format: int32
+      description: 사용자 운동 데이터 응답 DTO
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
